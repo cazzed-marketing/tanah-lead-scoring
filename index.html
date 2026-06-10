@@ -1,0 +1,123 @@
+
+<h2 class="sr-only">Lead scoring framework for land sale campaign with three qualification questions</h2>
+<style>
+.wrap{padding:1rem 0;font-family:var(--font-sans)}
+.q-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:2rem}
+.q-col h3{font-size:14px;font-weight:500;color:var(--color-text-secondary);margin:0 0 8px}
+.opt{padding:10px 12px;border-radius:var(--border-radius-md);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:13px;cursor:pointer;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);transition:all .15s}
+.opt:hover{border-color:var(--color-border-secondary)}
+.opt.sel{border-color:#534AB7;background:#EEEDFE}
+.opt .pts{font-weight:500;font-size:12px;border-radius:var(--border-radius-md);padding:2px 8px}
+.pts-3{background:#EAF3DE;color:#3B6D11}
+.pts-2{background:#FAEEDA;color:#854F0B}
+.pts-1{background:#FAECE7;color:#993C1D}
+.pts-0{background:#F1EFE8;color:#5F5E5A}
+.result-bar{margin-top:1.5rem;padding:1.25rem;border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.score-display{display:flex;align-items:center;gap:16px;margin-bottom:12px}
+.score-num{font-size:32px;font-weight:500}
+.score-label{font-size:16px;font-weight:500}
+.score-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.tier-bar{display:flex;gap:4px;margin:16px 0 8px;height:8px;border-radius:4px;overflow:hidden}
+.tier-seg{flex:1;border-radius:4px}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--color-text-secondary);flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend-dot{width:8px;height:8px;border-radius:2px}
+.action-text{margin-top:12px;padding:10px 12px;border-radius:var(--border-radius-md);font-size:13px;line-height:1.6}
+</style>
+
+<div class="wrap">
+<p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 4px">Klik satu jawapan dari setiap soalan untuk simulate scoring</p>
+
+<div class="q-row">
+  <div class="q-col">
+    <h3>Soalan 1: Tujuan beli</h3>
+    <div class="opt" data-q="1" data-pts="3" onclick="pick(this)"><span>Bisnes / Komersial</span><span class="pts pts-3">+3</span></div>
+    <div class="opt" data-q="1" data-pts="3" onclick="pick(this)"><span>Pelaburan</span><span class="pts pts-3">+3</span></div>
+    <div class="opt" data-q="1" data-pts="2" onclick="pick(this)"><span>Kediaman sendiri</span><span class="pts pts-2">+2</span></div>
+    <div class="opt" data-q="1" data-pts="1" onclick="pick(this)"><span>Belum pasti</span><span class="pts pts-1">+1</span></div>
+  </div>
+  <div class="q-col">
+    <h3>Soalan 2: Pengalaman beli</h3>
+    <div class="opt" data-q="2" data-pts="3" onclick="pick(this)"><span>Pernah beli</span><span class="pts pts-3">+3</span></div>
+    <div class="opt" data-q="2" data-pts="2" onclick="pick(this)"><span>Tengah cari</span><span class="pts pts-2">+2</span></div>
+    <div class="opt" data-q="2" data-pts="1" onclick="pick(this)"><span>Pertama kali</span><span class="pts pts-1">+1</span></div>
+  </div>
+  <div class="q-col">
+    <h3>Soalan 3: Timeline</h3>
+    <div class="opt" data-q="3" data-pts="3" onclick="pick(this)"><span>1–3 bulan</span><span class="pts pts-3">+3</span></div>
+    <div class="opt" data-q="3" data-pts="2" onclick="pick(this)"><span>3–6 bulan</span><span class="pts pts-2">+2</span></div>
+    <div class="opt" data-q="3" data-pts="1" onclick="pick(this)"><span>6 bulan+</span><span class="pts pts-1">+1</span></div>
+    <div class="opt" data-q="3" data-pts="0" onclick="pick(this)"><span>Survey dulu</span><span class="pts pts-0">+0</span></div>
+  </div>
+</div>
+
+<div class="tier-bar">
+  <div class="tier-seg" style="background:#E24B4A"></div>
+  <div class="tier-seg" style="background:#EF9F27"></div>
+  <div class="tier-seg" style="background:#5DCAA5"></div>
+  <div class="tier-seg" style="background:#1D9E75"></div>
+</div>
+<div class="legend">
+  <span><span class="legend-dot" style="background:#E24B4A"></span>Cold (0–3)</span>
+  <span><span class="legend-dot" style="background:#EF9F27"></span>Warm (4–5)</span>
+  <span><span class="legend-dot" style="background:#5DCAA5"></span>Hot (6–7)</span>
+  <span><span class="legend-dot" style="background:#1D9E75"></span>On fire (8–9)</span>
+</div>
+
+<div class="result-bar" id="result">
+  <div class="score-display">
+    <div class="score-num" id="scoreNum" style="color:var(--color-text-secondary)">–</div>
+    <div>
+      <div class="score-label" id="scoreLabel" style="color:var(--color-text-secondary)">Pilih jawapan di atas</div>
+    </div>
+  </div>
+  <div class="score-desc" id="scoreDesc">Klik satu option dari setiap soalan untuk lihat skor dan tindakan yang sesuai.</div>
+  <div class="action-text" id="actionText" style="display:none"></div>
+</div>
+</div>
+
+<script>
+var sel={};
+function pick(el){
+  var q=el.dataset.q;
+  document.querySelectorAll('.opt[data-q="'+q+'"]').forEach(function(o){o.classList.remove('sel')});
+  el.classList.add('sel');
+  sel[q]=parseInt(el.dataset.pts);
+  calc();
+}
+function calc(){
+  if(Object.keys(sel).length<3)return;
+  var total=sel['1']+sel['2']+sel['3'];
+  var num=document.getElementById('scoreNum');
+  var label=document.getElementById('scoreLabel');
+  var desc=document.getElementById('scoreDesc');
+  var action=document.getElementById('actionText');
+  num.textContent=total+'/9';
+  action.style.display='block';
+  if(total>=8){
+    num.style.color='#085041';label.style.color='#085041';
+    label.textContent='ON FIRE';
+    desc.textContent='Lead ni sangat serious — ada tujuan jelas, pengalaman, dan ready nak beli dalam masa terdekat.';
+    action.style.background='#E1F5EE';action.style.color='#085041';
+    action.innerHTML='<b>Tindakan:</b> Call dalam 1 jam. Jangan tunggu. Arrange site visit terus. Ini priority #1.';
+  }else if(total>=6){
+    num.style.color='#0F6E56';label.style.color='#0F6E56';
+    label.textContent='HOT LEAD';
+    desc.textContent='Lead yang kuat — ada intention yang jelas dan timeline yang reasonable.';
+    action.style.background='#E1F5EE';action.style.color='#0F6E56';
+    action.innerHTML='<b>Tindakan:</b> Call dalam 24 jam. Hantar details tanah via WhatsApp, then follow up untuk arrange viewing.';
+  }else if(total>=4){
+    num.style.color='#854F0B';label.style.color='#854F0B';
+    label.textContent='WARM LEAD';
+    desc.textContent='Ada interest tapi belum fully committed — mungkin masih explore options atau belum decide timeline.';
+    action.style.background='#FAEEDA';action.style.color='#854F0B';
+    action.innerHTML='<b>Tindakan:</b> WhatsApp dalam 24–48 jam. Hantar info + drone video. Nurture dengan content — jangan hard sell.';
+  }else{
+    num.style.color='#A32D2D';label.style.color='#A32D2D';
+    label.textContent='COLD LEAD';
+    desc.textContent='Masih awal — belum ada tujuan jelas, pengalaman, atau timeline. Tapi masih ada potensi kalau dinurture.';
+    action.style.background='#FCEBEB';action.style.color='#791F1F';
+    action.innerHTML='<b>Tindakan:</b> Masukkan dalam WhatsApp broadcast list. Hantar content berkala (video, update harga, testimonial). Jangan call dulu — biar dia warm up.';
+  }
+}
+</script>
